@@ -2,6 +2,9 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
+//railway link: https://railway.app/ - for hosting the app and database
+//https://basic-node-app-production-84ee.up.railway.app/
+
 dotenv.config();
 const app = express();
 
