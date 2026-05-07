@@ -1,11 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
-  // output   = "../generated/prisma"
 }
 
 datasource db {
@@ -16,5 +10,201 @@ model User {
   id        Int      @id @default(autoincrement())
   name      String
   email     String   @unique
+  password  String
+  role      Role     @default(USER)
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  contacts   Contact[]
+  deals      Deal[]
+  tasks      Task[]
+  activities Activity[]
+  notes      Note[]
+  companies  Company[]
+}
+
+model Contact {
+  id          Int       @id @default(autoincrement())
+  firstName   String
+  lastName    String
+  email       String?
+  phone       String?
+  companyName String?
+  jobTitle    String?
+  address     String?
+  city        String?
+  state       String?
+  zipCode     String?
+  country     String?
+  status      ContactStatus @default(ACTIVE)
+  source      String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  
+  deals       Deal[]
+  tasks       Task[]
+  activities  Activity[]
+  notesList   Note[]
+  companyId   Int?
+  company     Company? @relation(fields: [companyId], references: [id])
+}
+
+model Company {
+  id          Int       @id @default(autoincrement())
+  name        String
+  industry    String?
+  website     String?
+  phone       String?
+  address     String?
+  city        String?
+  state       String?
+  zipCode     String?
+  country     String?
+  revenue     String?
+  employees   Int?
+  status      CompanyStatus @default(ACTIVE)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  
+  contacts    Contact[]
+}
+
+model Deal {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  value       Float
+  currency    String   @default("USD")
+  stage       DealStage @default(QUALIFICATION)
+  probability Int       @default(0)
+  closeDate   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  
+  contactId   Int?
+  contact     Contact? @relation(fields: [contactId], references: [id])
+  
+  tasks       Task[]
+  activities  Activity[]
+  notes       Note[]
+}
+
+model Task {
+  id          Int        @id @default(autoincrement())
+  title       String
+  description String?
+  dueDate     DateTime?
+  priority    Priority   @default(MEDIUM)
+  status      TaskStatus @default(PENDING)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  
+  userId      Int
+  user        User       @relation(fields: [userId], references: [id])
+  
+  contactId   Int?
+  contact     Contact?   @relation(fields: [contactId], references: [id])
+  
+  dealId      Int?
+  deal        Deal?      @relation(fields: [dealId], references: [id])
+  
+  activities  Activity[]
+}
+
+model Activity {
+  id          Int           @id @default(autoincrement())
+  type        ActivityType
+  subject     String
+  description String?
+  duration    Int?
+  date        DateTime      @default(now())
+  createdAt   DateTime      @default(now())
+  
+  userId      Int
+  user        User          @relation(fields: [userId], references: [id])
+  
+  contactId   Int?
+  contact     Contact?      @relation(fields: [contactId], references: [id])
+  
+  dealId      Int?
+  deal        Deal?         @relation(fields: [dealId], references: [id])
+  
+  taskId      Int?
+  task        Task?         @relation(fields: [taskId], references: [id])
+}
+
+model Note {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  
+  contactId Int?
+  contact   Contact? @relation(fields: [contactId], references: [id])
+  
+  dealId    Int?
+  deal      Deal?    @relation(fields: [dealId], references: [id])
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  USER
+}
+
+enum ContactStatus {
+  ACTIVE
+  INACTIVE
+  LEAD
+  CUSTOMER
+}
+
+enum CompanyStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum DealStage {
+  QUALIFICATION
+  NEEDS_ANALYSIS
+  VALUE_PROPOSITION
+  ID_VERIFICATION
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ActivityType {
+  CALL
+  MEETING
+  EMAIL
+  DEMO
+  FOLLOW_UP
+  OTHER
 }
