@@ -6,7 +6,7 @@ import { prisma } from './lib/prisma.js';
 dotenv.config();
 const app = express();
 
-
+console.log("stfuyba")
 app.get('/', (req, res) => {
     res.send('Hello World!');
 }
